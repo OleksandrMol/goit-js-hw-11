@@ -27,7 +27,9 @@ async function searchImg(evt) {
     const input = evt.currentTarget.elements.searchQuery.value.trim();
     if (input === '') {
         clearAll();
-        return;
+        loadBt.hide();
+        Notiflix.Report.warning('Ooops..Add search request!');
+        return 
     }
     newImg.query = input;
     newImg.resetPage();      
@@ -37,8 +39,28 @@ async function searchImg(evt) {
     fetchArticles()
 }   
 
+async function getArticlesMarkup() {
+    try {
+        const data = await newImg.imageAPI();
+        if (data.totalHits === 0) {
+            clearAll()
+            Notiflix.Notify.failure('Sorry, there are no images matching your search query. Please try again.');
+        }else{
+            /* console.log(data) */
+            Notiflix.Notify.success(`Hooray! We found ${data.totalHits} images.`);
+            if (data.hits.length === 0 || data.hits.length >= data.totalHits ) {
+                loadBt.hide()
+                Notiflix.Notify.success("We're sorry, but you've reached the end of search results.");
+            }
+            return data.hits.reduce((markup, hit) => markup + createPlate(hit), "");
+        }
+    }catch (err) {
+        onError(err)
+        return 
 
- 
+    }
+}
+
 
 async function fetchArticles() { 
     
@@ -61,27 +83,7 @@ async function fetchArticles() {
 }
 
 
-async function getArticlesMarkup() {
-    try {
-        const data = await newImg.imageAPI();
-        if (data.totalHits === 0) {
-            Notiflix.Notify.failure(
-                'Sorry, there are no images matching your search query. Please try again.');
-        }else{
-            console.log(data)
-            Notiflix.Notify.success(`Hooray! We found ${data.totalHits} images.`);
-            if (data.hits.length === 0 || data.hits.length >= data.totalHits ) {
-                loadBt.hide  
-                showEndOfResultsMessage();
-            }
-            return data.hits.reduce((markup, hit) => markup + createPlate(hit), "");
-        }
-    }catch (err) {
-        onError(err)
-        return null
 
-    }
-}
 
 
 
@@ -132,6 +134,3 @@ function clearAll() {
   refs.gallery.innerHTML = '';
 }
 
-function showEndOfResultsMessage() {
-  Notiflix.Notify.info("We're sorry, but you've reached the end of search results.");
-}
