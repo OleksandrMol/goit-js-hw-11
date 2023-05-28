@@ -8,24 +8,25 @@ const safesearch = "true";
 
 
 export default class NewImg {
-constructor() {
+  constructor() {
     this.page = 1;
     this.query = "";
     this.perPage = 40;
   }
 
-    async  imageAPI() {
-    const  {data}  = await axios.get(`${URL}?key=${KEY}&q=${this.query}&image_type=${imgType}&orientation=${orientation}&safesearch=${safesearch}&per_page=${this.perPage}&page=${this.page}`);
+  async imageAPI() {
+    const { data } = await axios.get(`${URL}?key=${KEY}&q=${this.query}&image_type=${imgType}&orientation=${orientation}&safesearch=${safesearch}&per_page=${this.perPage}&page=${this.page}`);
     this.incrementPage();
     return data;
-}
+  }
 
-resetPage() {
+  resetPage() {
     this.page = 1;
   }
 
   incrementPage() {
     this.page += 1;
   }
+
 }
 

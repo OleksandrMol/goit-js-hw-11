@@ -36,7 +36,7 @@ async function searchImg(evt) {
     }
     newImg.query = input;
     newImg.resetPage();      
-
+    
     window.addEventListener('scroll', handleScrollDeb);
     /* loadBt.show(); */
     
@@ -50,8 +50,9 @@ async function getPicMarkup() {
         if (data.totalHits === 0) {
             clearAll()
             Notiflix.Notify.failure('Sorry, there are no images matching your search query. Please try again.');
-        }else{
-            if (data.hits.length === 0|| refs.gallery.children.length>= data.totalHits ) {
+        } else {
+            console.log(data)
+            if (data.hits.length === 0|| data.hits.length >= data.totalHits ) {
                 /* loadBt.hide() */
                 window.removeEventListener('scroll', handleScrollDeb);
                 Notiflix.Notify.info("We're sorry, but you've reached the end of search results.");
@@ -70,7 +71,12 @@ async function getPicMarkup() {
 
 async function fetchPhotos() { 
     /* loadBt.disable(); */
-    
+     if (newImg.page * newImg.perPage >= newImg.totalHits) {
+    window.removeEventListener('scroll', handleScrollDeb);
+    Notiflix.Notify.info("Извините, но вы достигли конца результатов поиска.");
+    return;
+  }
+
     window.addEventListener('scroll', handleScrollDeb);
     try {
         const markup = await getPicMarkup();
