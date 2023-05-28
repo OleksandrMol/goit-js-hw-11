@@ -47,18 +47,17 @@ async function searchImg(evt) {
 async function getPicMarkup() {
     try {
         const data = await newImg.imageAPI();
-                console.log(data);
-
         if (data.totalHits === 0) {
             clearAll()
             Notiflix.Notify.failure('Sorry, there are no images matching your search query. Please try again.');
         }else{
-            Notiflix.Notify.success(`Hooray! We found ${data.totalHits} images.`);
-            if (data.hits.length === 0|| data.hits.length >= data.totalHits ) {
+            if (data.hits.length === 0|| refs.gallery.children.length>= data.totalHits ) {
                 /* loadBt.hide() */
                 window.removeEventListener('scroll', handleScrollDeb);
                 Notiflix.Notify.info("We're sorry, but you've reached the end of search results.");
+                return;
             }
+            Notiflix.Notify.success(`Hooray! We found ${data.totalHits} images.`);
             return data.hits.reduce((markup, hit) => markup + createPlate(hit), "");
         }
     }catch (err) {
@@ -71,7 +70,8 @@ async function getPicMarkup() {
 
 async function fetchPhotos() { 
     /* loadBt.disable(); */
-     window.addEventListener('scroll', handleScrollDeb);
+    
+    window.addEventListener('scroll', handleScrollDeb);
     try {
         const markup = await getPicMarkup();
       if (!markup) throw new Error("No data"); 
