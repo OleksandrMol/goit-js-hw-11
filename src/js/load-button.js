@@ -1,4 +1,4 @@
-export default class LoadBt{
+/* export default class LoadBt{
     static classes = {
         hidden: "hidden",
     }
@@ -29,3 +29,4 @@ export default class LoadBt{
     }
 
 }
+ */

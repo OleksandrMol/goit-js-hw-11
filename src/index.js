@@ -1,14 +1,17 @@
 import NewImg from './js/API.js';
 import Notiflix from 'notiflix';
-import LoadBt from './js/load-button.js'
+/* import LoadBt from './js/load-button.js' */
 import SimpleLightbox from "simplelightbox";
 import "simplelightbox/dist/simple-lightbox.min.css";
+import debounce from 'lodash.debounce';
+const DEBOUNCE_DELAY = 500;
+
 
 const newImg = new NewImg();
-const loadBt = new LoadBt({
+/* const loadBt = new LoadBt({
     selector: ".load-more",
     isHidden: true,
-})
+}) */
 
 const refs = {
     searchForm: document.getElementById('search-form'),
@@ -18,7 +21,7 @@ const refs = {
 
 
 refs.searchForm.addEventListener('submit', searchImg);
-loadBt.button.addEventListener("click", fetchArticles);
+/* loadBt.button.addEventListener("click", fetchPhotos); */
 
 
 
@@ -27,69 +30,63 @@ async function searchImg(evt) {
     const input = evt.currentTarget.elements.searchQuery.value.trim();
     if (input === '') {
         clearAll();
-        loadBt.hide();
+        /* loadBt.hide(); */
         Notiflix.Report.warning('Ooops..Add search request!');
         return 
     }
     newImg.query = input;
     newImg.resetPage();      
-    loadBt.show();
+
+    window.addEventListener('scroll', handleScrollDeb);
+    /* loadBt.show(); */
     
      
-    fetchArticles()
+    fetchPhotos()
 }   
 
-async function getArticlesMarkup() {
+async function getPicMarkup() {
     try {
         const data = await newImg.imageAPI();
+                console.log(data);
+
         if (data.totalHits === 0) {
             clearAll()
             Notiflix.Notify.failure('Sorry, there are no images matching your search query. Please try again.');
         }else{
-            /* console.log(data) */
             Notiflix.Notify.success(`Hooray! We found ${data.totalHits} images.`);
-            if (data.hits.length === 0 || data.hits.length >= data.totalHits ) {
-                loadBt.hide()
-                Notiflix.Notify.success("We're sorry, but you've reached the end of search results.");
+            if (data.hits.length === 0|| data.hits.length >= data.totalHits ) {
+                /* loadBt.hide() */
+                window.removeEventListener('scroll', handleScrollDeb);
+                Notiflix.Notify.info("We're sorry, but you've reached the end of search results.");
             }
             return data.hits.reduce((markup, hit) => markup + createPlate(hit), "");
         }
     }catch (err) {
         onError(err)
-        return 
+        return  Notiflix.Notify.info("We're sorry, but you've reached the end of search results.")
 
     }
 }
 
 
-async function fetchArticles() { 
-    
-    loadBt.disable();
-    
+async function fetchPhotos() { 
+    /* loadBt.disable(); */
+     window.addEventListener('scroll', handleScrollDeb);
     try {
-        const markup = await getArticlesMarkup();
-        if (!markup) {
-      loadBt.hide();
-      return    }
-        if (!markup) throw new Error("No data"); 
+        const markup = await getPicMarkup();
+      if (!markup) throw new Error("No data"); 
+       
     updateNewsList(markup);
-        
-    
   } catch (err) {
     onError(err);
   }
-    loadBt.enable();
-
+    /* loadBt.enable(); */
 }
 
 
+ 
 
-
-
-
-function createPlate({webformatURL,largeImageURL,tags,likes,views,comments,downloads,
-}) {
-    clearAll();
+function createPlate({webformatURL,largeImageURL,tags,likes,views,comments,downloads}) {
     return  `<a class="gallery__link" href="${largeImageURL}" data-lightbox="gallery" data-title="${tags}">
        <div class="photo-card">
                 <img class="photo-card__img" src="${webformatURL}" alt="${tags}" loading="lazy" />
@@ -116,6 +113,8 @@ function createPlate({webformatURL,largeImageURL,tags,likes,views,comments,downl
 }
 
 const lightbox = new SimpleLightbox('.gallery a');
+
+
 function updateNewsList(markup) {
     refs.gallery.insertAdjacentHTML("beforeend", markup);
     lightbox.refresh();
@@ -125,8 +124,10 @@ function updateNewsList(markup) {
 
 function onError(err) {
     console.error(err);
-    loadBt.hide();
-    clearAll();
+    window.removeEventListener('scroll', handleScrollDeb);
+
+    /* loadBt.hide(); */
+    /* clearAll(); */
 }
 
 
@@ -134,3 +135,12 @@ function clearAll() {
   refs.gallery.innerHTML = '';
 }
 
+
+const handleScrollDeb = debounce(() => {
+  const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
+
+  if (scrollTop + clientHeight >= scrollHeight - 1) {
+    fetchPhotos();
+  }
+}, DEBOUNCE_DELAY);
+window.addEventListener('scroll', handleScrollDeb);

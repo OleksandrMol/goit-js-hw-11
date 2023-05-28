@@ -1,3 +1,6 @@
+body{
+    padding-bottom: 20px;
+}
 .search-form {
     display: flex;
     align-items: center;
@@ -7,6 +10,21 @@
     height: 40px;
     background-color: rgba(110, 165, 211, 0.733);
 }
+.search-form input {
+    border-radius: 5px;
+    height: 35px;
+    width: 300px;
+    outline: none;
+    border: 1px solid rgb(158, 165, 173);
+}
+
+.search-form button {
+    border-radius: 5px;
+    height: 32px;
+    border: 1px solid transparent;
+    outline: none;
+}
+
 .load-more{
     display: block;
         margin: 0 auto;

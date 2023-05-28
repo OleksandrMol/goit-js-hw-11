@@ -11,11 +11,11 @@ export default class NewImg {
 constructor() {
     this.page = 1;
     this.query = "";
-    this.per_page = 40;
+    this.perPage = 40;
   }
 
     async  imageAPI() {
-    const  {data}  = await axios.get(`${URL}?key=${KEY}&q=${this.query}&image_type=${imgType}&orientation=${orientation}&safesearch=${safesearch}&per_page=${this.per_page}&page=${this.page}`);
+    const  {data}  = await axios.get(`${URL}?key=${KEY}&q=${this.query}&image_type=${imgType}&orientation=${orientation}&safesearch=${safesearch}&per_page=${this.perPage}&page=${this.page}`);
     this.incrementPage();
     return data;
 }
