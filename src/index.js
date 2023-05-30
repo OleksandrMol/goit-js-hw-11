@@ -35,6 +35,7 @@ async function searchImg(evt) {
         return 
     }
     newImg.query = input;
+    clearAll();
     newImg.resetPage();      
     
     window.addEventListener('scroll', handleScrollDeb);
@@ -52,7 +53,7 @@ async function getPicMarkup() {
             Notiflix.Notify.failure('Sorry, there are no images matching your search query. Please try again.');
         } else {
             console.log(data)
-            if (data.hits.length === 0|| data.hits.length >= data.totalHits ) {
+            if (data.hits.length === 0|| data.hits.length > data.totalHits ) {
                 /* loadBt.hide() */
                 window.removeEventListener('scroll', handleScrollDeb);
                 Notiflix.Notify.info("We're sorry, but you've reached the end of search results.");
